@@ -14,12 +14,14 @@
 /// @brief Create Motor Controlled by the L298N
 /// @param gpioPin GPIO Pin
 /// @param pwmPin  PWM Pin
-L298N::L298N(int gpioPin, int pwmPin){
+L298N::L298N(int gpioPin1, int gpioPin2, int pwmPin){
 
-    pinMode(gpioPin, OUTPUT);
+    pinMode(gpioPin1, OUTPUT);
+    pinMode(gpioPin2, OUTPUT);
     pinMode(pwmPin, OUTPUT);
 
-    _gpioPin = gpioPin;
+    _gpioPin1 = gpioPin1;
+    _gpioPin2 = gpioPin2;
     _pwmPin = pwmPin;
 
 }

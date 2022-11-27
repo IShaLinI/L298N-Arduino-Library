@@ -20,7 +20,7 @@ class L298N
 
   public:
 
-    L298N(int gpioPin, int pwmPin);
+    L298N(int gpioPin1, int gpioPin2, int pwmPin);
 
     void set(double speed);
     double get();
@@ -32,7 +32,8 @@ class L298N
 
 
   private:
-    int _gpioPin;
+    int _gpioPin1;
+    int _gpioPin2;
     int _pwmPin;
     double _lastSet;
     boolean _isInverted = false;
