@@ -25,6 +25,7 @@ class L298N
     void set(double speed);
     double get();
     void setInverted(boolean isInverted);
+    void setNeutralMode(boolean isBrake);
     boolean getInverted();
     void disable();
     void stopMotor();
@@ -37,6 +38,7 @@ class L298N
     int _pwmPin;
     double _lastSet;
     boolean _isInverted = false;
+    boolean _brakeMode = false;
 
 };
 

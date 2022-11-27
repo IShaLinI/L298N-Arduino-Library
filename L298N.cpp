@@ -30,20 +30,37 @@ L298N::L298N(int gpioPin1, int gpioPin2, int pwmPin){
 /// @param speed Value -1 to 1
 void L298N::set(double speed){
 
-    _lastSet = constrain(speed,-1,1);
+    if(_isInverted){
+        speed *= -1;
+    }
 
-    int _speed = round(_lastSet * 1000);
-    _speed = (_isInverted) ? -_speed : _speed;
+    _lastSet = speed;
 
-    map(_speed, -1000, 1000, -256, 255);
-    
-    uint8_t spd_bytes[2];
+    if(speed == 0 && _brakeMode){
+        int16_t full_on = 255;  
+        digitalWrite(PIN_IN1, LOW);
+        digitalWrite(PIN_IN2,LOW);
+        analogWrite(PIN_ENA_PWM, full_on);
+        return
+    }
 
-    spd_bytes[0] = (_speed >> 8) & 0x01;    // strip off direction bit (using 9th bit)
-    spd_bytes[1] = _speed & 0xFF;           // obtain speed value from lower bits
+    uint8_t direct = 0;    // forward
+    if (speed < 0){
+        direct = 1;        // reverse
+    }
 
-    digitalWrite(_gpioPin,spd_bytes[0]);  // direction
-    analogWrite(_pwmPin,spd_bytes[1]);   // speed value for PWM
+    switch (direct) {
+        case 0:            // forward
+            digitalWrite(PIN_IN1, HIGH);
+            digitalWrite(PIN_IN2, LOW);
+            analogWrite(PIN_ENA_PWM, speed * 255);
+            break;
+        case 1:            // reverse
+            digitalWrite(PIN_IN1, LOW);
+            digitalWrite(PIN_IN2, HIGH);
+            analogWrite(PIN_ENA_PWM, -speed * 255);
+            break;
+    }
 
 }
 
@@ -55,6 +72,10 @@ double L298N::get(){
 /// @param isInverted Whether or not to invert the motor
 void L298N::setInverted(boolean isInverted){
     _isInverted = isInverted;
+}
+
+void L298N::setNeutralMode(boolean isBrake){
+    _brakeMode = isBrake;
 }
 
 /// @return Motor invert state
@@ -74,5 +95,5 @@ void L298N::stopMotor(){
 
 /// @return Motor Description 
 String L298N::getDescription(){
-    return "GPIO Pin: {_gpioPin}  PWM Pin: {_pwmPin}";
+    return "GPIO Pin1: {_gpioPin1} GPIO Pin2: {_gpioPin2} PWM Pin: {_pwmPin}";
 }
